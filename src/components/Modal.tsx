@@ -1,12 +1,25 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, FormEvent } from "react";
+import { BookedTripProps, TripProps } from "../types";
 
 type ModalProps = {
+  trip: TripProps;
+  guests: string;
+  date: string;
   onClose: () => void;
   setGuests: (amount: string) => void;
   setDate: (date: string) => void;
+  onBookTrip: (trip: BookedTripProps) => void;
 };
 
-const Modal: React.FC<ModalProps> = ({ onClose, setGuests, setDate }) => {
+const Modal: React.FC<ModalProps> = ({
+  trip,
+  guests,
+  date,
+  onClose,
+  setGuests,
+  setDate,
+  onBookTrip,
+}) => {
   const onChangeGuests = (e: ChangeEvent<HTMLInputElement>) => {
     setGuests(e.target.value);
   };
@@ -15,20 +28,34 @@ const Modal: React.FC<ModalProps> = ({ onClose, setGuests, setDate }) => {
     setDate(e.target.value);
   };
 
+  const onClickBook = () => {
+    const bookedTrip = {
+      ...trip,
+      guests,
+      date,
+    };
+    onBookTrip(bookedTrip);
+  };
+
+  const preventSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onClose();
+  };
+
   return (
     <div className="modal">
       <div className="trip-popup">
         <button onClick={onClose} className="trip-popup__close">
           ×
         </button>
-        <form className="trip-popup__form" autoComplete="off">
+        <form className="trip-popup__form" autoComplete="off" onSubmit={preventSubmit}>
           <div className="trip-info">
-            <h3 className="trip-info__title">Iceland</h3>
+            <h3 className="trip-info__title">{trip?.title}</h3>
             <div className="trip-info__content">
               <span className="trip-info__duration">
-                <strong>15</strong> days
+                <strong>{trip?.duration}</strong> days
               </span>
-              <span className="trip-info__level">easy</span>
+              <span className="trip-info__level">{trip?.level}</span>
             </div>
           </div>
           <label className="trip-popup__input input">
@@ -48,9 +75,12 @@ const Modal: React.FC<ModalProps> = ({ onClose, setGuests, setDate }) => {
             />
           </label>
           <span className="trip-popup__total">
-            Total: <output className="trip-popup__total-value">4000$</output>
+            Total:{" "}
+            <output className="trip-popup__total-value">
+              {trip && trip?.price * parseInt(guests)}$
+            </output>
           </span>
-          <button className="button" type="submit">
+          <button onClick={onClickBook} className="button" type="submit">
             Book a trip
           </button>
         </form>

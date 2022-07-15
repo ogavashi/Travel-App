@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import trips from "../assets/data/trips.json";
 import Modal from "../components/Modal";
-import { TripProps } from "../types";
+import { BookedTripProps, TripProps } from "../types";
 
-const Trip: React.FC = () => {
+type TripPageProps = {
+  trips: TripProps[];
+  onBookTrip: (trip: BookedTripProps) => void;
+};
+
+const Trip: React.FC<TripPageProps> = ({ trips, onBookTrip }) => {
   const [trip, setTrip] = useState<TripProps>();
 
   const { id } = useParams();
@@ -15,13 +19,13 @@ const Trip: React.FC = () => {
   const [date, setDate] = useState("1");
 
   useEffect(() => {
-    const tripItem = trips.find((trip) => trip.id === id);
+    const tripItem = trips.find((trip) => trip.id === id) as TripProps;
     if (!tripItem) {
       alert("Could not find trip");
       navigate("/");
     }
     setTrip(tripItem);
-  }, [id, navigate]);
+  }, [id, navigate, trips]);
 
   const toggleModal = useCallback(() => {
     setIsVisible((prev) => !prev);
@@ -52,7 +56,17 @@ const Trip: React.FC = () => {
           </button>
         </div>
       </div>
-      {isVisible && <Modal onClose={toggleModal} setGuests={setGuests} setDate={setDate} />}
+      {isVisible && trip && (
+        <Modal
+          trip={trip}
+          guests={guests}
+          date={date}
+          onClose={toggleModal}
+          setGuests={setGuests}
+          setDate={setDate}
+          onBookTrip={onBookTrip}
+        />
+      )}
     </main>
   );
 };

@@ -8,14 +8,23 @@ import Home from "./pages/Home";
 import Bookings from "./pages/Bookings";
 import Trip from "./pages/Trip";
 
+import trips from "./assets/data/trips.json"; // Trips
+import { BookedTripProps } from "./types";
+
 function App() {
+  const bookedTrips: BookedTripProps[] = [];
+
+  const onBookTrip = (trip: BookedTripProps) => {
+    bookedTrips.push(trip);
+  };
+
   return (
     <div className="wrapper">
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/trip/:id" element={<Trip />} />
-        <Route path="/bookings" element={<Bookings />} />
+        <Route path="/" element={<Home trips={trips} />} />
+        <Route path="/trip/:id" element={<Trip trips={trips} onBookTrip={onBookTrip} />} />
+        <Route path="/bookings" element={<Bookings bookedTrips={bookedTrips} />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="*" element={<Navigate to="/" replace />} />

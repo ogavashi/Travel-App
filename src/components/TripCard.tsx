@@ -5,7 +5,6 @@ import { TripProps } from "../types";
 const TripCard: React.FC<TripProps> = ({
   id,
   title,
-  description,
   level,
   duration,
   price,

@@ -1,6 +1,11 @@
 import React from "react";
-import { TripsProps } from "../types";
+import { TripProps } from "../types";
+
 import TripCard from "./TripCard";
+
+type TripsProps = {
+  trips: TripProps[];
+};
 
 const Trips: React.FC<TripsProps> = ({ trips }) => {
   const tripsCards = trips.map((trip) => <TripCard {...trip} key={trip.id} />);

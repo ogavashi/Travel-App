@@ -1,9 +1,23 @@
 import React, { ChangeEvent } from "react";
-import { FilterProps } from "../types";
 
-const Filters: React.FC<FilterProps> = ({ searchValue, setSearchValue }) => {
+type FilterProps = {
+  searchValue: string;
+  setSearchValue: (searchValue: string) => void;
+  setDuration: (duration: string) => void;
+  setLevel: (level: string) => void;
+};
+
+const Filters: React.FC<FilterProps> = ({ searchValue, setSearchValue, setDuration, setLevel }) => {
   const onChangeInput = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
+  };
+
+  const onChangeDuration = (event: ChangeEvent<HTMLSelectElement>) => {
+    setDuration(event.target.value);
+  };
+
+  const onChangeLevel = (event: ChangeEvent<HTMLSelectElement>) => {
+    setLevel(event.target.value);
   };
 
   return (
@@ -22,7 +36,7 @@ const Filters: React.FC<FilterProps> = ({ searchValue, setSearchValue }) => {
         </label>
         <label className="select">
           <span className="visually-hidden">Search by duration</span>
-          <select name="duration">
+          <select onChange={onChangeDuration} name="duration">
             <option value="">duration</option>
             <option value="0_x_5">&lt; 5 days</option>
             <option value="5_x_10">&lt; 10 days</option>
@@ -31,7 +45,7 @@ const Filters: React.FC<FilterProps> = ({ searchValue, setSearchValue }) => {
         </label>
         <label className="select">
           <span className="visually-hidden">Search by level</span>
-          <select name="level">
+          <select onChange={onChangeLevel} name="level">
             <option value="">level</option>
             <option value="easy">easy</option>
             <option value="moderate">moderate</option>
