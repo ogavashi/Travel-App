@@ -8,9 +8,11 @@ type BookingPageProps = {
 };
 
 const Bookings: React.FC<BookingPageProps> = ({ bookedTrips, onCancelBook }) => {
-  const bookedTripsCards = bookedTrips.map((booked) => (
-    <BookedCard bookedItem={booked} key={booked.id} onCancelBook={onCancelBook} />
-  ));
+  const bookedTripsCards = bookedTrips
+    .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+    .map((booked) => (
+      <BookedCard bookedItem={booked} key={booked.id} onCancelBook={onCancelBook} />
+    ));
 
   return (
     <main className="bookings-page">
