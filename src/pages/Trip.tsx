@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../components/Modal";
-import { BookedTripProps, TripProps } from "../types";
+import { BookedTrip, TripItem } from "../types";
 
 type TripPageProps = {
-  trips: TripProps[];
-  onBookTrip: (trip: BookedTripProps) => void;
+  trips: TripItem[];
+  onBookTrip: (trip: BookedTrip) => void;
 };
 
 const Trip: React.FC<TripPageProps> = ({ trips, onBookTrip }) => {
-  const [trip, setTrip] = useState<TripProps>();
+  const [trip, setTrip] = useState<TripItem>();
 
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [isVisible, setIsVisible] = useState(false);
   const [guests, setGuests] = useState("1");
-  const [date, setDate] = useState("1");
+  const [date, setDate] = useState(new Date().toLocaleDateString("en-ca"));
 
   useEffect(() => {
-    const tripItem = trips.find((trip) => trip.id === id) as TripProps;
+    const tripItem = trips.find((trip) => trip.id === id) as TripItem;
     if (!tripItem) {
       alert("Could not find trip");
       navigate("/");

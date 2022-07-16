@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { TripProps } from "../types";
+import { TripItem } from "../types";
 
-const TripCard: React.FC<TripProps> = ({
+const TripCard: React.FC<TripItem> = ({
   id,
   title,
   level,

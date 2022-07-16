@@ -1,10 +1,10 @@
 import React from "react";
-import { TripProps } from "../types";
+import { TripItem } from "../types";
 
 import TripCard from "./TripCard";
 
 type TripsProps = {
-  trips: TripProps[];
+  trips: TripItem[];
 };
 
 const Trips: React.FC<TripsProps> = ({ trips }) => {

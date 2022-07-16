@@ -3,11 +3,11 @@ import Filters from "../components/Filters";
 import Trips from "../components/Trips";
 
 import useDebounce from "../hooks/useDebounce";
-import { TripProps } from "../types";
+import { TripItem } from "../types";
 import { inRange } from "../utils/inRange";
 
 type HomePageProps = {
-  trips: TripProps[];
+  trips: TripItem[];
 };
 
 const Home: React.FC<HomePageProps> = ({ trips }) => {

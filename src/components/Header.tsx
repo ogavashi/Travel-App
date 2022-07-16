@@ -16,7 +16,7 @@ const Header = () => {
         <Link to="/" className="header__logo">
           Travel App
         </Link>
-        {location.pathname === "/" && (
+        {location.pathname !== "/sign-in" && location.pathname !== "/sign-up" && (
           <nav className="header__nav">
             <ul className="nav-header__list">
               <li className="nav-header__item" title="Bookings">

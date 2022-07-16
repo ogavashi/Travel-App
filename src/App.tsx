@@ -9,14 +9,21 @@ import Bookings from "./pages/Bookings";
 import Trip from "./pages/Trip";
 
 import trips from "./assets/data/trips.json"; // Trips
-import { BookedTripProps } from "./types";
+import bookings from "./assets/data/booked.json"; // Booked trips
+
+import { BookedTrip } from "./types";
+import { useCallback, useState } from "react";
 
 function App() {
-  const bookedTrips: BookedTripProps[] = [];
+  const [bookedTrips, setBookedTrips] = useState<BookedTrip[]>(bookings);
 
-  const onBookTrip = (trip: BookedTripProps) => {
-    bookedTrips.push(trip);
-  };
+  const onBookTrip = useCallback((trip: BookedTrip) => {
+    setBookedTrips((prev) => [...prev, trip]);
+  }, []);
+
+  const onCancelBook = useCallback((id: string) => {
+    setBookedTrips((prev) => prev.filter((trip) => trip.id !== id));
+  }, []);
 
   return (
     <div className="wrapper">
@@ -24,7 +31,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home trips={trips} />} />
         <Route path="/trip/:id" element={<Trip trips={trips} onBookTrip={onBookTrip} />} />
-        <Route path="/bookings" element={<Bookings bookedTrips={bookedTrips} />} />
+        <Route
+          path="/bookings"
+          element={<Bookings bookedTrips={bookedTrips} onCancelBook={onCancelBook} />}
+        />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="*" element={<Navigate to="/" replace />} />

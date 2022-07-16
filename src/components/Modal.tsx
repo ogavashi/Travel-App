@@ -1,14 +1,14 @@
 import React, { ChangeEvent, FormEvent } from "react";
-import { BookedTripProps, TripProps } from "../types";
+import { BookedTrip, TripItem } from "../types";
 
 type ModalProps = {
-  trip: TripProps;
+  trip: TripItem;
   guests: string;
   date: string;
   onClose: () => void;
   setGuests: (amount: string) => void;
   setDate: (date: string) => void;
-  onBookTrip: (trip: BookedTripProps) => void;
+  onBookTrip: (trip: BookedTrip) => void;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -21,7 +21,8 @@ const Modal: React.FC<ModalProps> = ({
   onBookTrip,
 }) => {
   const onChangeGuests = (e: ChangeEvent<HTMLInputElement>) => {
-    setGuests(e.target.value);
+    const amount = parseInt(e.target.value);
+    if (amount <= 10 && amount > 0) setGuests(e.target.value);
   };
 
   const onChangeDate = (e: ChangeEvent<HTMLInputElement>) => {
@@ -29,10 +30,19 @@ const Modal: React.FC<ModalProps> = ({
   };
 
   const onClickBook = () => {
-    const bookedTrip = {
-      ...trip,
-      guests,
+    const bookedTrip: BookedTrip = {
+      id: String(Date.now()), //instead of uuid
+      userId: "1dd97a12-848f-4a1d-8a7d-34a2132fca94",
+      tripId: trip.id,
+      guests: parseInt(guests),
+      trip: {
+        title: trip.title,
+        duration: trip.duration,
+        price: trip.price,
+      },
+      totalPrice: trip?.price * parseInt(guests),
       date,
+      createdAt: new Date().toISOString(),
     };
     onBookTrip(bookedTrip);
   };
@@ -41,6 +51,8 @@ const Modal: React.FC<ModalProps> = ({
     e.preventDefault();
     onClose();
   };
+
+  const currentDate = new Date();
 
   return (
     <div className="modal">
@@ -60,7 +72,15 @@ const Modal: React.FC<ModalProps> = ({
           </div>
           <label className="trip-popup__input input">
             <span className="input__heading">Date</span>
-            <input onChange={onChangeDate} name="date" type="date" required />
+            <input
+              value={date}
+              onChange={onChangeDate}
+              name="date"
+              type="date"
+              min={currentDate.toLocaleDateString("en-ca")}
+              max={`${currentDate.getFullYear() + 1}-12-31`}
+              required
+            />
           </label>
           <label className="trip-popup__input input">
             <span className="input__heading">Number of guests</span>
@@ -70,12 +90,12 @@ const Modal: React.FC<ModalProps> = ({
               type="number"
               min="1"
               max="10"
-              defaultValue={1}
+              value={guests}
               required
             />
           </label>
           <span className="trip-popup__total">
-            Total:{" "}
+            Total:
             <output className="trip-popup__total-value">
               {trip && trip?.price * parseInt(guests)}$
             </output>

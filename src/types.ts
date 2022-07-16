@@ -1,4 +1,4 @@
-export type TripProps = {
+export type TripItem = {
   id: string;
   title: string;
   description: string;
@@ -8,14 +8,17 @@ export type TripProps = {
   image: string;
 };
 
-export type BookedTripProps = {
+export type BookedTrip = {
   id: string;
-  title: string;
-  description: string;
-  level: string;
-  duration: number;
-  price: number;
-  image: string;
-  guests: string;
+  userId: string;
+  tripId: string;
+  guests: number;
   date: string;
+  trip: {
+    title: string;
+    duration: number;
+    price: number;
+  };
+  totalPrice: number;
+  createdAt: string;
 };

@@ -1,13 +1,16 @@
 import React from "react";
 import BookedCard from "../components/BookedCard";
-import { BookedTripProps } from "../types";
+import { BookedTrip } from "../types";
 
 type BookingPageProps = {
-  bookedTrips: BookedTripProps[];
+  bookedTrips: BookedTrip[];
+  onCancelBook: (id: string) => void;
 };
 
-const Bookings: React.FC<BookingPageProps> = ({ bookedTrips }) => {
-  const bookedTripsCards = bookedTrips.map((booked) => <BookedCard {...booked} key={booked.id} />);
+const Bookings: React.FC<BookingPageProps> = ({ bookedTrips, onCancelBook }) => {
+  const bookedTripsCards = bookedTrips.map((booked) => (
+    <BookedCard bookedItem={booked} key={booked.id} onCancelBook={onCancelBook} />
+  ));
 
   return (
     <main className="bookings-page">
