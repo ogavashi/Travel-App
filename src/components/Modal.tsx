@@ -22,11 +22,15 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const onChangeGuests = (e: ChangeEvent<HTMLInputElement>) => {
     const amount = parseInt(e.target.value);
-    if (amount <= 10 && amount > 0) setGuests(e.target.value);
+    if (amount <= 10 && amount > 0) {
+      setGuests(e.target.value);
+    }
   };
 
   const onChangeDate = (e: ChangeEvent<HTMLInputElement>) => {
-    setDate(e.target.value);
+    if (Date.parse(e.target.value) >= Date.now()) {
+      setDate(e.target.value);
+    }
   };
 
   const onClickBook = () => {
