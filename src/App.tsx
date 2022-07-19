@@ -13,8 +13,12 @@ import bookings from "./assets/data/booked.json"; // Booked trips
 
 import { BookedTrip } from "./types";
 import { useCallback, useState } from "react";
+import { selectCurrentToken } from "./redux/auth/selectors";
+import { useSelector } from "react-redux";
 
 function App() {
+  const isAuthorized = useSelector(selectCurrentToken);
+
   const [bookedTrips, setBookedTrips] = useState<BookedTrip[]>(bookings);
 
   const onBookTrip = useCallback((trip: BookedTrip) => {

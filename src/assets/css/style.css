@@ -430,6 +430,21 @@ select {
   color: var(--color-blue-300);
 }
 
+.sign-in-form p,
+.sign-up-form p {
+  color: red;
+  margin: 0;
+  height: 10px;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+.sign-in-form .button:disabled,
+.sign-up-form .button:disabled {
+  background-color: gray;
+  cursor: default;
+}
+
 /* main-page */
 
 /* trips-filter */
