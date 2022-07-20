@@ -223,6 +223,15 @@ select {
   animation: rotate 1.2s infinite linear;
 }
 
+/* placeholder */
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 /* trip-info */
 
 .trip-info {
@@ -293,6 +302,7 @@ select {
   font-size: var(--font-size-500);
   font-family: "Playfair Display", serif;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .header__nav {
@@ -581,6 +591,18 @@ select {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.trip-popup__form p {
+  color: red;
+  font-size: 13px;
+  height: 20px;
+  margin-bottom: 15px;
+}
+
+.trip-popup__form .button:disabled {
+  background-color: gray;
+  cursor: default;
 }
 
 .trip-popup__total {

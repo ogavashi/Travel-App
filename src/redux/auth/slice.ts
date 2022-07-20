@@ -2,8 +2,8 @@ import { AuthSliceState } from "./types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: AuthSliceState = {
-  user: JSON.parse(sessionStorage.getItem("user") || "").user,
-  token: JSON.parse(sessionStorage.getItem("user") || "").token,
+  user: JSON.parse(sessionStorage.getItem("user") || "{}").user,
+  token: JSON.parse(sessionStorage.getItem("user") || "{}").token,
 };
 
 const authSlice = createSlice({
@@ -16,8 +16,10 @@ const authSlice = createSlice({
       state.token = token;
       sessionStorage.setItem("user", JSON.stringify(state));
     },
-    logOut(state, action) {
-      state = initialState;
+    logOut(state) {
+      console.log("logged out");
+      state.user = null;
+      state.token = null;
       sessionStorage.clear();
     },
   },

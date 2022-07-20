@@ -19,7 +19,7 @@ const SignUp = () => {
       email: yup.string().email("Enter valid email").required("Please, enter email"),
       password: yup
         .string()
-        .min(3, "Passowrd should be at least 3 characters")
+        .min(3, "Passowrd must be at least 3 characters")
         .max(20, "Passowrd must be at least 20 characters")
         .required(),
     })

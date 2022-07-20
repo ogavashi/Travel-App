@@ -1,54 +1,67 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { LoginRequest, useLoginMutation } from "../redux/api/authAPI";
+import { useDispatch } from "react-redux";
+import { setCreddentials } from "../redux/auth/slice";
 
 const SignIn = () => {
-  const [passwordValue, setPasswordValue] = useState("");
-  const [emailValue, setEmailValue] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+
+  const dispatch = useDispatch();
+
+  const validationSchema = yup
+    .object({
+      email: yup.string().email("Enter valid email").required("Please, enter email"),
+      password: yup
+        .string()
+        .min(3, "Passowrd must be at least 3 characters")
+        .max(20, "Passowrd must be at least 20 characters")
+        .required(),
+    })
+    .required();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginRequest>({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit: SubmitHandler<LoginRequest> = async (data) => {
+    try {
+      const user = await login(data).unwrap();
+      dispatch(setCreddentials(user));
+      navigate("/");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Credentials are incorrect");
+    }
+  };
 
   const navigate = useNavigate();
 
-  const onChangePasswordValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setPasswordValue(event.target.value);
-  };
-
-  const onChangeEmailValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmailValue(event.target.value);
-  };
-
-  const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (passwordValue.length >= 3 && passwordValue.length <= 20 && emailValue) navigate("/login");
-  };
-
   return (
     <main className="sign-in-page">
+      <ToastContainer />
       <h1 className="visually-hidden">Travel App</h1>
-      <form onSubmit={onFormSubmit} className="sign-in-form" autoComplete="off">
+      <form onSubmit={handleSubmit(onSubmit)} className="sign-in-form" autoComplete="off">
         <h2 className="sign-in-form__title">Sign In</h2>
         <label className="trip-popup__input input">
           <span className="input__heading">Email</span>
-          <input
-            onChange={onChangeEmailValue}
-            value={emailValue}
-            name="email"
-            type="email"
-            required
-          />
+          <input {...register("email")} type="email" />
+          <p>{errors.email?.message}</p>
         </label>
         <label className="trip-popup__input input">
           <span className="input__heading">Password</span>
-          <input
-            onChange={onChangePasswordValue}
-            name="password"
-            type="password"
-            value={passwordValue}
-            autoComplete="new-password"
-            minLength={3}
-            maxLength={12}
-            required
-          />
+          <input {...register("password")} autoComplete="new-password"/>
+          <p>{errors.password?.message}</p>
         </label>
-        <button className="button" type="submit">
+        <button className="button" type="submit" disabled={isLoading}>
           Sign In
         </button>
       </form>

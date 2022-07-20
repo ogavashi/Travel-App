@@ -1,4 +1,3 @@
-import { RootState } from "./../store";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface User {
@@ -14,7 +13,7 @@ export interface UserResponse {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -25,15 +24,9 @@ export interface RegisterRequest {
 }
 
 export const authAPI = createApi({
+  reducerPath: "authAPI",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://travel-app-api.glitch.me/api/v1/auth/",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
   }),
   endpoints: (builder) => ({
     signUp: builder.mutation<UserResponse, RegisterRequest>({
@@ -47,7 +40,7 @@ export const authAPI = createApi({
     }),
     login: builder.mutation<UserResponse, LoginRequest>({
       query: (credentials) => ({
-        url: "login",
+        url: "sign-in",
         method: "POST",
         body: credentials,
       }),

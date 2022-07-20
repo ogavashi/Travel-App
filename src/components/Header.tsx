@@ -1,22 +1,37 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import caseSVG from "../assets/images/briefcase.svg";
 import profileSVG from "../assets/images/user.svg";
+import { logOut } from "../redux/auth/slice";
+
+import { useSelector } from "react-redux";
+import { selectCurrentToken } from "../redux/auth/selectors";
 
 const Header = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const dispatch = useDispatch();
+
+  const isAuthorized = useSelector(selectCurrentToken);
 
   const onClickOut = () => {
+    dispatch(logOut());
     navigate("/sign-in");
+  };
+
+  const onClickLogo = () => {
+    if (isAuthorized) {
+      navigate("/");
+    }
   };
 
   return (
     <header className="header">
       <div className="header__inner">
-        <Link to="/" className="header__logo">
+        <div onClick={onClickLogo} className="header__logo">
           Travel App
-        </Link>
-        {location.pathname !== "/sign-in" && location.pathname !== "/sign-up" && (
+        </div>
+        {isAuthorized && (
           <nav className="header__nav">
             <ul className="nav-header__list">
               <li className="nav-header__item" title="Bookings">
