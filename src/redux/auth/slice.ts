@@ -17,7 +17,6 @@ const authSlice = createSlice({
       sessionStorage.setItem("user", JSON.stringify(state));
     },
     logOut(state) {
-      console.log("logged out");
       state.user = null;
       state.token = null;
       sessionStorage.clear();
