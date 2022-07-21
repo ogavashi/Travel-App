@@ -5,7 +5,7 @@ import profileSVG from "../assets/images/user.svg";
 import { logOut } from "../redux/auth/slice";
 
 import { useSelector } from "react-redux";
-import { selectCurrentToken } from "../redux/auth/selectors";
+import { selectCurrentToken, selectCurrentUser } from "../redux/auth/selectors";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -13,6 +13,9 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const isAuthorized = useSelector(selectCurrentToken);
+
+  const user = useSelector(selectCurrentUser);
+  const userName = user?.fullName;
 
   const onClickOut = () => {
     dispatch(logOut());
@@ -45,7 +48,7 @@ const Header = () => {
                   <span className="visually-hidden">Profile</span>
                   <img src={profileSVG} alt="profile icon" />
                   <ul className="profile-nav__list">
-                    <li className="profile-nav__item profile-nav__username">John Doe</li>
+                    <li className="profile-nav__item profile-nav__username">{userName}</li>
                     <li className="profile-nav__item">
                       <button onClick={onClickOut} className="profile-nav__sign-out button">
                         Sign Out
