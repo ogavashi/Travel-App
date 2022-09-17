@@ -3,19 +3,31 @@ import Filters from "../components/Filters";
 import Trips from "../components/Trips";
 
 import useDebounce from "../hooks/useDebounce";
-import { TripItem } from "../types";
+import { useGetTripsQuery } from "../redux/api/tripAPI";
 import { inRange } from "../utils/inRange";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-type HomePageProps = {
-  trips: TripItem[];
-};
-
-const Home: React.FC<HomePageProps> = ({ trips }) => {
+const Home = () => {
   const [duration, setDuration] = useState("");
   const [level, setLevel] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
   const debouncedValue = useDebounce<string>(searchValue);
+
+  const { data, isLoading, error, isError } = useGetTripsQuery();
+
+  const trips = data ? Object.values(data) : [];
+
+  if (isError && "data" in error) {
+    if (error.status === 404) {
+      toast.dismiss();
+      toast.error("Couldn't get trips", { icon: "😔" });
+    } else {
+      toast.dismiss();
+      toast.error("Ops, something went wrong (");
+    }
+  }
 
   const filteredTrips = trips.filter(
     (trip) =>
@@ -27,13 +39,14 @@ const Home: React.FC<HomePageProps> = ({ trips }) => {
   return (
     <main>
       <h1 className="visually-hidden">Travel App</h1>
+      <ToastContainer />
       <Filters
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         setDuration={setDuration}
         setLevel={setLevel}
       />
-      <Trips trips={filteredTrips} />
+      {isLoading ? <div className="loader"></div> : <Trips trips={filteredTrips} />}
     </main>
   );
 };

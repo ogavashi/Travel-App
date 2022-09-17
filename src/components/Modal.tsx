@@ -1,70 +1,66 @@
-import React, { ChangeEvent, FormEvent } from "react";
-import { BookedTrip, TripItem } from "../types";
+import React, { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { TripItem } from "../types";
+import * as yup from "yup";
+import { BookRequest, useBookTripMutation } from "../redux/api/tripAPI";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../redux/auth/selectors";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type ModalProps = {
   trip: TripItem;
-  guests: string;
-  date: string;
   onClose: () => void;
-  setGuests: (amount: string) => void;
-  setDate: (date: string) => void;
-  onBookTrip: (trip: BookedTrip) => void;
 };
 
-const Modal: React.FC<ModalProps> = ({
-  trip,
-  guests,
-  date,
-  onClose,
-  setGuests,
-  setDate,
-  onBookTrip,
-}) => {
-  const onChangeGuests = (e: ChangeEvent<HTMLInputElement>) => {
-    const amount = parseInt(e.target.value);
-    if (amount <= 10 && amount > 0) {
-      setGuests(e.target.value);
-    }
-  };
+const Modal: React.FC<ModalProps> = ({ trip, onClose }) => {
+  const currentDate = new Date();
 
-  const onChangeDate = (e: ChangeEvent<HTMLInputElement>) => {
-    if (Date.parse(e.target.value) >= Date.now()) {
-      setDate(e.target.value);
-    }
-  };
+  const user = useSelector(selectCurrentUser);
+  const userId = user?.id as string;
 
-  const onClickBook = () => {
-    const bookedTrip: BookedTrip = {
-      id: String(Date.now()), //instead of uuid
-      userId: "1dd97a12-848f-4a1d-8a7d-34a2132fca94",
+  const [bookTrip, { isLoading }] = useBookTripMutation();
+
+  const validationSchema = yup
+    .object({
+      date: yup.date().min(new Date()).required(),
+      guests: yup.number().min(1).max(10).required(),
+    })
+    .required();
+
+  const { register, handleSubmit } = useForm<BookRequest>({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const [guests, setGuests] = useState(1);
+
+  const onSubmit: SubmitHandler<BookRequest> = async (data) => {
+    const toBeBooked = {
       tripId: trip.id,
-      guests: parseInt(guests),
-      trip: {
-        title: trip.title,
-        duration: trip.duration,
-        price: trip.price,
-      },
-      totalPrice: trip?.price * parseInt(guests),
-      date,
-      createdAt: new Date().toISOString(),
+      userId,
+      guests: data.guests,
+      date: data.date,
     };
-    onBookTrip(bookedTrip);
-  };
-
-  const preventSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    try {
+      await bookTrip(toBeBooked).unwrap();
+      toast.dismiss();
+      toast.success("Your trip was successfully booked");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Could not book a trip, try again later");
+    }
     onClose();
   };
 
-  const currentDate = new Date();
-
   return (
     <div className="modal">
+      <ToastContainer />
       <div className="trip-popup">
         <button onClick={onClose} className="trip-popup__close">
           ×
         </button>
-        <form className="trip-popup__form" autoComplete="off" onSubmit={preventSubmit}>
+        <form className="trip-popup__form" autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
           <div className="trip-info">
             <h3 className="trip-info__title">{trip?.title}</h3>
             <div className="trip-info__content">
@@ -77,34 +73,28 @@ const Modal: React.FC<ModalProps> = ({
           <label className="trip-popup__input input">
             <span className="input__heading">Date</span>
             <input
-              value={date}
-              onChange={onChangeDate}
-              name="date"
+              {...register("date")}
               type="date"
               min={currentDate.toLocaleDateString("en-ca")}
               max={`${currentDate.getFullYear() + 1}-12-31`}
-              required
             />
           </label>
           <label className="trip-popup__input input">
             <span className="input__heading">Number of guests</span>
             <input
-              onChange={onChangeGuests}
-              name="guests"
+              {...register("guests")}
               type="number"
-              min="1"
-              max="10"
+              min={1}
+              max={10}
               value={guests}
-              required
+              onChange={(e) => setGuests(parseInt(e.target.value))}
             />
           </label>
           <span className="trip-popup__total">
             Total:
-            <output className="trip-popup__total-value">
-              {trip && trip?.price * parseInt(guests)}$
-            </output>
+            <output className="trip-popup__total-value">{trip.price * guests}$</output>
           </span>
-          <button onClick={onClickBook} className="button" type="submit">
+          <button className="button" type="submit" disabled={isLoading}>
             Book a trip
           </button>
         </form>

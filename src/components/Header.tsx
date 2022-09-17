@@ -1,22 +1,40 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import caseSVG from "../assets/images/briefcase.svg";
 import profileSVG from "../assets/images/user.svg";
+import { logOut } from "../redux/auth/slice";
+
+import { useSelector } from "react-redux";
+import { selectCurrentToken, selectCurrentUser } from "../redux/auth/selectors";
 
 const Header = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const dispatch = useDispatch();
+
+  const isAuthorized = useSelector(selectCurrentToken);
+
+  const user = useSelector(selectCurrentUser);
+  const userName = user?.fullName;
 
   const onClickOut = () => {
+    dispatch(logOut());
     navigate("/sign-in");
+  };
+
+  const onClickLogo = () => {
+    if (isAuthorized) {
+      navigate("/");
+    }
   };
 
   return (
     <header className="header">
       <div className="header__inner">
-        <Link to="/" className="header__logo">
+        <div onClick={onClickLogo} className="header__logo">
           Travel App
-        </Link>
-        {location.pathname !== "/sign-in" && location.pathname !== "/sign-up" && (
+        </div>
+        {isAuthorized && (
           <nav className="header__nav">
             <ul className="nav-header__list">
               <li className="nav-header__item" title="Bookings">
@@ -30,7 +48,7 @@ const Header = () => {
                   <span className="visually-hidden">Profile</span>
                   <img src={profileSVG} alt="profile icon" />
                   <ul className="profile-nav__list">
-                    <li className="profile-nav__item profile-nav__username">John Doe</li>
+                    <li className="profile-nav__item profile-nav__username">{userName}</li>
                     <li className="profile-nav__item">
                       <button onClick={onClickOut} className="profile-nav__sign-out button">
                         Sign Out

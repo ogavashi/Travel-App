@@ -1,56 +1,73 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { RegisterRequest, useSignUpMutation } from "../redux/api/authAPI";
+import { setCreddentials } from "../redux/auth/slice";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SignUp = () => {
-  const [passwordValue, setPasswordValue] = useState("");
-  const [emailValue, setEmailValue] = useState("");
-  const [nameValue, setNameValue] = useState("");
+  const [signUp, { isLoading }] = useSignUpMutation();
+
+  const dispatch = useDispatch();
+
+  const validationSchema = yup
+    .object({
+      fullName: yup.string().required("Please, enter a full name"),
+      email: yup.string().email("Enter valid email").required("Please, enter email"),
+      password: yup
+        .string()
+        .min(3, "Passowrd must be at least 3 characters")
+        .max(20, "Passowrd must be at least 20 characters")
+        .required(),
+    })
+    .required();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterRequest>({
+    resolver: yupResolver(validationSchema),
+  });
+
+  const onSubmit: SubmitHandler<RegisterRequest> = async (data) => {
+    try {
+      const user = await signUp(data).unwrap();
+      dispatch(setCreddentials(user));
+      navigate("/");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Email already registered");
+    }
+  };
 
   const navigate = useNavigate();
 
-  const onChangePasswordValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setPasswordValue(event.target.value);
-  };
-
-  const onChangeEmailValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmailValue(event.target.value);
-  };
-
-  const onChangeNameValue = (event: ChangeEvent<HTMLInputElement>) => {
-    setNameValue(event.target.value);
-  };
-
-  const onFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (passwordValue.length >= 3 && passwordValue.length <= 20 && emailValue && nameValue)
-      navigate("/login");
-  };
-
   return (
     <main className="sign-up-page">
+      <ToastContainer />
       <h1 className="visually-hidden">Travel App</h1>
-      <form onSubmit={onFormSubmit} className="sign-up-form" autoComplete="off">
+      <form onSubmit={handleSubmit(onSubmit)} className="sign-up-form" autoComplete="off">
         <h2 className="sign-up-form__title">Sign Up</h2>
         <label className="trip-popup__input input">
           <span className="input__heading">Full name</span>
-          <input onChange={onChangeNameValue} minLength={1} name="full-name" type="text" required />
+          <input {...register("fullName")} />
+          <p>{errors.fullName?.message}</p>
         </label>
         <label className="trip-popup__input input">
           <span className="input__heading">Email</span>
-          <input onChange={onChangeEmailValue} name="email" type="email" required />
+          <input {...register("email")} type="email" />
+          <p>{errors.email?.message}</p>
         </label>
         <label className="trip-popup__input input">
           <span className="input__heading">Password</span>
-          <input
-            onChange={onChangePasswordValue}
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            minLength={3}
-            required
-          />
+          <input {...register("password")} autoComplete="new-password" />
+          <p>{errors.password?.message}</p>
         </label>
-        <button className="button" type="submit">
+        <button className="button" type="submit" disabled={isLoading}>
           Sign Up
         </button>
       </form>
